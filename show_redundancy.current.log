@@ -1,0 +1,8 @@
+athe-asr99a  ACTIVE NODE is 0/RP0/CPU0 STANDBY NODE is 0/RP1/CPU0, Active node reload CARD_SHUTDOWN ,Standby node reload Initiating switch-over. 
+nyma-asr99b  ACTIVE NODE is 0/RP0/CPU0 STANDBY NODE is 0/RP1/CPU0, Active node reload CARD_SHUTDOWN ,Standby node reload Initiating switch-over. 
+chan-asr99b ACTIVE NODE is 0/RP0/CPU0 , STANDBY NODE is 0/RP1/CPU0, Active node reload  Crash Reason: Kernel Crash , 
+hera-asr99a ACTIVE NODE is 0/RP0/CPU0 , STANDBY NODE is 0/RP1/CPU0, Active node reload  Crash Reason: Kernel Crash , 
+lari-asr99a ACTIVE NODE is 0/RP0/CPU0 , STANDBY NODE is 0/RP1/CPU0, Active node reload  Crash Reason: Kernel Crash , 
+lari-asr99b ACTIVE NODE is 0/RP0/CPU0 , STANDBY NODE is 0/RP1/CPU0, Active node reload  Cause: MBI-HELLO reloading node on receiving reload notification , Standby node reload Cause: User initiated forced reload all
+patr-asr99a ACTIVE NODE is 0/RP0/CPU0 , STANDBY NODE is 0/RP1/CPU0, Active node reload  Cause: User initiated forced reload all , Standby node reload Cause: MBI-HELLO reloading node on receiving reload notification
+skag-asr99b ACTIVE NODE is 0/RP0/CPU0 , STANDBY NODE is 0/RP1/CPU0, Active node reload  Crash Reason: Kernel Crash , 

@@ -1,0 +1,77 @@
+---
+
+- name: Checking Failover state
+  hosts: CORE
+# order: sorted
+  connection: network_cli
+  become: yes
+  become_method: enable
+  gather_facts: no
+  vars:
+    slack_token: TL48R5E3D/B024HCWLP63/eKPt9V4AScWXmLwiLp2wfLeA
+  tasks:
+#   - name: "get system facts"
+#     iosxr_facts:
+#       gather_subset: 
+#         - "!hardware"
+#         - "!config"  
+#         - "default"
+#         - "!interfaces"  
+#     register: facts
+#   - debug: var=facts
+    - name: "Executing show redudnancy"
+      iosxr_command:
+        commands:
+          - show redundancy
+      register: output
+      ignore_unreachable: yes
+#     vars: 
+#       mmsg: |
+#           REDUNDANCY : {{output.stdout|to_nice_json}}
+#   - debug: 
+#       msg: |
+#               " ACTIVE NODE is: {{output.stdout_lines[0][2].split(' ')[1]}} , STANDBY NODE is: {{output.stdout_lines[0][3].split('(')[1].split(')')[0]}}, {{output.stdout_lines[0][19]}} ,{{output.stdout_lines[0][20]}}\n"
+#     when:   output.stdout_lines[0][7]=="Reload and boot info"     
+#   - debug: 
+#       msg: |
+#               " ACTIVE NODE is: {{output.stdout_lines[0][2].split(' ')[1]}} , STANDBY NODE is: {{output.stdout_lines[0][3].split('(')[1].split(')')[0]}}, {{output.stdout_lines[0][30]}} , {{output.stdout_lines[0][31]}}\n"
+#     when:   ansible_net_image is defined
+#     when:   output.stdout_lines[0][21] is defined
+#     when:   output.stdout_lines[0][21]=="Reload and boot info"     
+    - name: Touch Previous state file 
+      shell:  touch show_redundancy.previous.log
+      delegate_to:  localhost
+      run_once: true
+    - name: Removing current state           
+      shell:  rm show_redundancy.current.log
+      delegate_to:  localhost               
+      run_once: true
+    - name: Creating new current state           
+      shell:  echo -e "{{inventory_hostname}}  ACTIVE NODE is {{output.stdout_lines[0][2].split(' ')[1]}} STANDBY NODE is {{output.stdout_lines[0][3].split('(')[1].split(')')[0]}}, {{output.stdout_lines[0][19]}} ,{{output.stdout_lines[0][20]}}" >> show_redundancy.current.log
+      delegate_to:  localhost               
+      when:   output.stdout_lines[0][7]=="Reload and boot info"
+      ignore_errors: yes
+    - name: Creating new current state           
+      shell:  echo -e "{{inventory_hostname}} ACTIVE NODE is {{output.stdout_lines[0][2].split(' ')[1]}} , STANDBY NODE is {{output.stdout_lines[0][3].split('(')[1].split(')')[0]}}, {{output.stdout_lines[0][30]}} , {{output.stdout_lines[0][31]}}" >> show_redundancy.current.log
+      delegate_to:  localhost               
+      ignore_errors: yes
+      when:   ansible_net_image is defined
+    - name: DIFF STATES
+      shell: diff show_redundancy.current.log show_redundancy.previous.log 
+      delegate_to:  localhost               
+      register: to_slack
+      failed_when: "to_slack.rc > 1"
+      run_once: true
+
+    - name: SLACK           
+      slack:
+       token: "{{ slack_token }}"
+       msg: "{{to_slack.stdout}}" 
+      delegate_to:  localhost               
+      run_once: true
+      when: to_slack.rc!=0
+
+    - name: Copying current state to previous state for next run
+      shell:  cp show_redundancy.current.log show_redundancy.previous.log
+      delegate_to:  localhost               
+      run_once: true
